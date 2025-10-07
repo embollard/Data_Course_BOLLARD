@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Create the object csv_files by listing all files in the "Data/" directory
 # and end with the .csv extension.
 csv_files <- list.files(path = "Data/", pattern = "\\.csv$")
@@ -60,4 +61,68 @@ all_files = list.files('Data/', pattern = '.csv$', recursive = T)
     file = paste0('Data/',i)
     #print (file)
     print(readLines(file, n = 2, warn = FALSE))
+=======
+# Create the object csv_files by listing all files in the "Data/" directory
+# and end with the .csv extension.
+csv_files <- list.files(path = "Data/", pattern = "\\.csv$")
+
+#list.files() will allow R to look inside specified path("data/")
+#filter by pattern: expression ||.csv$ only selects files that have the .csv extension
+#list of file names is assigned to csv_files object
+
+# Print the contents of the 'csv_files' object to see the result
+print(csv_files)
+# List the .csv files and store the result in the 'csv_files' object
+csv_files = list.files(path = "Data/", pattern = "\\.csv$")
+
+# use the length() function to count the  number of files in the object 
+num_csv_files = length(csv_files)
+
+# Print the result
+print(paste("The number of .csv files found is:", num_csv_files))
+
+# The lenght() function can be run on the object to see the output 
+length(csv_files)
+
+# Read the CSV file and store the contents in a data frame called 'df'
+df = read.csv("Data/wingspan_vs_mass.csv")
+
+#save pathway
+path = "Data/wingspan_vs_mass.csv"
+
+#save pathway to file
+file_from_path = read.csv(path)
+
+#View the first few rows of the data frame to confirm it loaded correctly
+head(df)
+
+#Set the directory
+database_directory = "Data_Course_BOLLARD/'Data'"
+
+#define file path
+file_path = "Data"
+
+
+list.files('Data/', recursive = T)
+#find files recursively in the directory that begin with the letter "b"
+all_files = list.files('Data/', pattern = '^b', recursive = T)
+
+#Loop through each 'b' file and display the first line
+  for (i in all_files) {
+      # Read the first line of the file
+      file = paste0('Data/', i)
+      #print(file)
+      print(readLines(file, n = 2, warn = FALSE))
+  }
+
+#Find any files (recursively) in the Data/ directory that end in .csv
+all_files = list.files('Data/', pattern = '.csv$', recursive = T)
+
+#Loop through each '.csv' file and display the first line  
+  for (i in all_files) {
+    #Read the first line of the file
+    file = paste0('Data/',i)
+    #print (file)
+    print(readLines(file, n = 2, warn = FALSE))
+>>>>>>> 504d5448c61fd184ee22f89f04053d82b47a882c
 }
