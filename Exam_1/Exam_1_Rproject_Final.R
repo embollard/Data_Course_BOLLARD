@@ -1,5 +1,5 @@
-getwd()
-setwd("C:/Users/Angie/Desktop/Data_Course_BOLLARD/BIOL3100_Exams/Exam_1")
+#getwd()
+#setwd("C:/Users/Angie/Desktop/Data_Course_BOLLARD/BIOL3100_Exams/Exam_1")
 ## Reading in csv and creating a data frame
 df = read.csv('cleaned_covid_data.csv')
 ## Making sure State column is treated as a character
