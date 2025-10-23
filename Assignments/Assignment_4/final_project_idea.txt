@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 My idea for my data analysis final project is to analyze a longevity factors csv. 
 I looked for several on the NIH website, but because of privacy concerns they have not made the data available to the public. 
 So I found a csv on genes, variants and studies in the LongevityMap from the Human Ageing Genomic Resources website. 
+=======
+My idea for my data analysis final project is to analyze a longevity factors csv. 
+I looked for several on the NIH website, but because of privacy concerns they have not made the data available to the public. 
+So I found a csv on genes, variants and studies in the LongevityMap from the Human Ageing Genomic Resources website. 
+>>>>>>> 8becf029644d0aaf3d0eae13c4088e1e86b68fe8
 I don't know if this is the best dataset available. I would like some input on finding an available database.
