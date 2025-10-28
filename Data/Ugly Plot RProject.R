@@ -8,10 +8,10 @@ head(honor)
 names(honor)
 subset(honor, grepl("Zuko", character(), ignore.case = TRUE))
 
-honor_counts <- honor %>%
-  mutate(Character = ifelse(is.na(Character) | Character == "", "Unknown", Character)) %>%
-  group_by(Character) %>%
-  summarise(honor_mentions = n()) %>%
+honor_counts <- honor |>
+  mutate(Character = ifelse(is.na(Character) | Character == "", "Unknown", Character)) |>
+  group_by(Character) |>
+  summarise(honor_mentions = n()) |>
   arrange(desc(honor_mentions))
 
 # Make sure we have the counts ready
@@ -66,6 +66,14 @@ p <- ggplot(top20, aes(x = total_number,
   ) +
   transition_reveal(total_number) +             # points grow by x-value
   ease_aes('cubic-in-out')
+
+#Manually patch gganimate's internal function
+unlockBinding("format_frame", asNamespace("gganimate"))
+assign("format_frame", function(i, nframes) {
+  nc <- ceiling(log10(nframes + 1))
+  sprintf(paste0("%0", nc, "d"), i)
+}, envir = asNamespace("gganimate"))
+lockBinding("format_frame", asNamespace("gganimate"))
 
 # Animate
 options(gganimate.frame_format = "%04d")
