@@ -185,7 +185,7 @@ headers = colnames(dat)
 print(headers)
 
 # Put into tidy format
-u5mr_tidy = dat %>%
+dat_tidy = dat %>%
   pivot_longer(
     cols = starts_with("U5MR."),
     names_to = "Year",
@@ -198,67 +198,30 @@ u5mr_tidy = dat %>%
   filter(!is.na(U5MR), !is.na(Continent))
 
 # --- Define the Models ---
-mod1 = lm(U5MR ~ Year, data = u5mr_tidy)
-mod2 = lm(U5MR ~ Year + Continent, data = u5mr_tidy)
-mod3 = lm(U5MR ~ Year * Continent, data = u5mr_tidy)
+mod1 = glm(data = dat_tidy,
+           formula = U5MR ~ Year)
+summary(mod1)
+mod2 = glm(data = dat_tidy,
+           formula = U5MR ~ Year + Continent)
+summary(mod2)
+mod3 = glm(data = dat_tidy,
+           formula = U5MR ~ Year * Continent) 
+summary(mod3)
 
-# --- Generate individual plot objects using the 'long' prediction data ---
-prediction_data_base = expand.grid(
-  Year = seq(min(u5mr_tidy$Year), max(u5mr_tidy$Year), by = 1),
-  Continent = unique(u5mr_tidy$Continent)
-) %>%
-  mutate(
-    pred_mod1 = predict(mod1, newdata = .),
-    pred_mod2 = predict(mod2, newdata = .),
-    pred_mod3 = predict(mod3, newdata = .)
-  ) %>%
-  pivot_longer(
-    cols = starts_with("pred_"),
-    names_to = "Model",
-    values_to = "Prediction"
-  ) %>%
-  mutate(
-    Model = recode(Model, 
-                   "pred_mod1" = "Model 1 (Year only)",
-                   "pred_mod2" = "Model 2 (Year + Continent)",
-                   "pred_mod3" = "Model 3 (Year * Continent)")
-  )
+compare_performance(mod1, mod2, mod3) %>% plot()
 
+## Make a prediction of U5MR based on models and save
+dat_tidy$pred1 = predict(mod1, dat_tidy)
+dat_tidy$pred2 = predict(mod2, dat_tidy)
+dat_tidy$pred3 = predict(mod3, dat_tidy)
 
-# Create the base ggplot call with the raw data
-base_plot = ggplot(u5mr_tidy, aes(x = Year, y = U5MR)) +
-  geom_point(alpha = 0.05, color = "gray") +
-  facet_wrap(~ Continent) +
-  theme_minimal() +
-  labs(y = "U5MR", x = "Year")
-
-# Now add the specific prediction lines and titles for each model using 'patchwork'
-p1 = base_plot + 
-  geom_line(data = filter(prediction_data_base, Model == "Model 1 (Year only)"), 
-            aes(y = Prediction), color = "dodgerblue", size = 1) + 
-  labs(title = "M1: Year Only Fit")
-
-p2 = base_plot + 
-  geom_line(data = filter(predictions_long, Model == "Model 2 (Year + Continent)"), 
-            aes(y = Prediction), color = "dodgerblue", size = 1) + 
-  labs(title = "M2: Additive Fit")
-
-p3 = base_plot + 
-  geom_line(data = filter(predictions_long, Model == "Model 3 (Year * Continent)"), 
-            aes(y = Prediction), color = "dodgerblue", size = 1) + 
-  labs(title = "M3: Interactive Fit")
-
-
-# --- Combine the plots into a single image using patchwork ---
-
-# Arrange the plots side-by-side using the | operator
-combined_plot = p1 | p2 | p3
-
-# Add a unifying title to the whole arrangement
-final_plot = combined_plot + plot_annotation(
-  title = 'Comparison of U5MR Model Predictions by Continent',
-  theme = theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"))
-)
+# --- Combine the plots into a single image ---
+final_plot = dat_tidy %>% 
+  pivot_longer(starts_with('pred')) %>% 
+  ggplot(aes(x = Year, y = U5MR, color = factor(Continent))) +
+  geom_point() +
+  geom_point(aes(y = value), color = 'black') +
+  facet_wrap(~ name)
 
 # Print the final combined plot
 print(final_plot)
@@ -283,6 +246,7 @@ print(predicted_u5mr)
 #Prediction error was 34.7%
 
 # To correct this prediction,we can account for non-linear trends using polynomial terms
-mod3 = lm(U5MR ~ poly(Year, 2) * Continent, data = u5mr_tidy)
+mod3 = glm(data = dat_tidy,
+           formula = U5MR ~ poly(Year, 2) * Continent) 
 
 # This correction gives a prediction of 14.21 which is a error rate of 9.38%
