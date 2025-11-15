@@ -54,7 +54,7 @@ headers = colnames(dat)
 print(headers)
 
 # Put into tidy format
-u5mr_tidy <- u5mr_data_raw %>%
+u5mr_tidy <- dat %>%
   pivot_longer(
     cols = starts_with("U5MR."),
     names_to = "Year",
