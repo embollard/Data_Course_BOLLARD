@@ -3,7 +3,7 @@ library(gganimate)
 library(gifski)
 
 # Read Dataset
-dat = read_csv("C:/Users/Angie/Desktop/Data_Course_BOLLARD/Data/BioLog_Plate_Data.csv")
+dat = read_csv("C:/Users/Angie/Desktop/Data_Course_BOLLARD/Assignments/Assignment_6/BioLog_Plate_Data.csv")
 View(dat)
 head(dat)
 
@@ -61,7 +61,7 @@ ggsave("biolog_plot_final.png", width = 8, height = 5)
 #####################################################################################
 
 # 1. Read the dataset
-dat = read_csv("C:/Users/Angie/Desktop/Data_Course_BOLLARD/Data/BioLog_Plate_Data.csv")
+dat = read_csv("C:/Users/Angie/Desktop/Data_Course_BOLLARD/Assignments/Assignment_6/BioLog_Plate_Data.csv")
 # Define the specific Sample IDs we want to plot
 selected_samples <- c("Clear_Creek", "Soil_1", "Soil_2", "Waste_Water")
 # Clean, transform, and summarize the data
