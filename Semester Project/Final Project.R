@@ -2,13 +2,11 @@
 install.packages("survival")
 install.packages("survminer")
 install.packages("ggsurvplot")
-install.packages("gridExtra")
 library(tidyverse)
 library(dplyr)
 library(survival)
 library(survminer)
 library(ggplot2)
-library(gridExtra)
 
 # 1. Import data set
 cancer_data = read.csv("clinical_data_breast_cancer.csv")
@@ -47,6 +45,7 @@ simplified_analysis <- cancer_data %>%
 
 # 4. Display the resulting table
 print(simplified_analysis)
+View(simplified_analysis)
 
 # --- Define TNBC based on status ---
 # TNBC patients are:
@@ -91,10 +90,56 @@ tnbc_proportion <- cancer_data %>%
   ) %>%
   arrange(Converted.Stage)
 
-View(final_data)
-
 # 7. Display the resulting table
 print(tnbc_proportion)
+
+# --- 8. Create the Plot ---
+# The plot will visualize the 'Proportion_TNBC' on the y-axis
+# and 'Converted.Stage' on the x-axis.
+tnbc_plot <- ggplot(
+  data = tnbc_proportion, 
+  aes(x = Converted.Stage, y = Proportion_TNBC)
+) +
+  # Use geom_bar to create a bar chart. 
+  # stat="identity" tells ggplot to use the actual y-values 
+  # (Proportion_TNBC) from the data.
+  geom_bar(stat = "identity", fill = "darkblue", alpha = 0.8) +
+  
+  # Add the percentage labels on top of the bars for clarity
+  geom_text(
+    aes(label = Percentage_TNBC), 
+    # Position the text slightly above the bar
+    vjust = -0.5, 
+    # Set the font size
+    size = 3.5 
+  ) +
+  
+  # Customize labels and title
+  labs(
+    title = "Proportion of Triple-Negative Breast Cancer (TNBC) by Cancer Stage",
+    x = "Cancer Stage (Converted)",
+    y = "Proportion of Patients with TNBC"
+  ) +
+  
+  # Improve the y-axis scale to be from 0 to 1 (0% to 100%)
+  scale_y_continuous(
+    labels = scales::percent, 
+    limits = c(0, max(tnbc_proportion$Proportion_TNBC) * 1.1)
+  ) +
+  
+  # Apply a clean theme
+  theme_minimal() +
+  
+  # Further theme customizations for better aesthetics
+  theme(
+    # Center the plot title
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    # Ensure axis text is readable
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+# --- 10. Display the Plot ---
+print(tnbc_plot)
 
 ---------------------------------------------------------------------------------------
 # 8. Ensure the stage variable is a factor and the survival event status is correct
