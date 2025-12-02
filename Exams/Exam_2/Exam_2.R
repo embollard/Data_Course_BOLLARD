@@ -3,7 +3,7 @@ library(ggplot2)
 library(gganimate)
 
 # Read in data set
-dat = read.csv("C:/Users/Angie/Desktop/Data_Course_BOLLARD/Exam_2/unicef-u5mr.csv")
+dat = read.csv("unicef-u5mr.csv")
 View(dat)
 headers = colnames(dat)
 print(headers)
@@ -48,7 +48,7 @@ ggsave("u5mr_plot.png", width = 10, height = 7, units = "in", dpi = 300)
 #############################################################################
 
 # Read in data set
-dat = read.csv("C:/Users/Angie/Desktop/Data_Course_BOLLARD/Exam_2/unicef-u5mr.csv")
+dat = read.csv("unicef-u5mr.csv")
 View(dat)
 headers = colnames(dat)
 print(headers)
@@ -105,7 +105,7 @@ install.packages("AICcmodavg")
 library(AICcmodavg) # For model comparison table
 
 # Read in data set
-dat = read.csv("C:/Users/Angie/Desktop/Data_Course_BOLLARD/Exam_2/unicef-u5mr.csv")
+dat = read.csv("unicef-u5mr.csv")
 View(dat)
 headers = colnames(dat)
 print(headers)
@@ -180,7 +180,7 @@ library('ggplot2')
 library('dplyr')
 
 # Read in data set
-dat = read.csv("C:/Users/Angie/Desktop/Data_Course_BOLLARD/Exam_2/unicef-u5mr.csv")
+dat = read.csv("unicef-u5mr.csv")
 headers = colnames(dat)
 print(headers)
 
