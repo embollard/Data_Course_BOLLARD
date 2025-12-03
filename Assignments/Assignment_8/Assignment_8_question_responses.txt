@@ -1,0 +1,67 @@
+1. Are any of your predicted response values from your best model scientifically meaningless? Explain.
+Yes, some of the predicted response values are potentially scientifically meaningless because the dependent variable (the growth rate) represents a biological process
+and usually can't be negative. But if a mushroom were decaying at a measurable rate, that would be a negative number and would not really work in a linear model.  
+2. In your plots, did you find any non-linear relationships? In plot 1 and plot 2 I used geom_smooth(method = "lm") which created a linear line, but the actual growth of a mushroom tends to follow a parabolic or quadreatic curve. 
+Do a bit of research online and give a link to at least one resource explaining how to deal with modeling non-linear relationships in R. https://www.youtube.com/watch?v=6V_VvweZkoI
+3. Write the code you would use to model the data found in “/Data/non_linear_relationship.csv” with a linear model.
+# ==============================================================================
+# R Script for Non-Linear Modeling using Linear Regression Techniques
+# ==============================================================================
+
+# 1. Load Data (Assumed to have columns X and Y with a curved relationship)
+data_path_non_linear <- "/Data/non_linear_relationship.csv" 
+# Assuming the file exists in the specified path
+tryCatch({
+  non_linear_dat <- read.csv(file = data_path_non_linear, header = TRUE, stringsAsFactors = TRUE)
+  print(paste("Data loaded successfully from:", data_path_non_linear))
+}, error = function(e) {
+  # Create simulated data if file is not found, to ensure runnable code
+  set.seed(99)
+  X <- seq(1, 100, 1)
+  # Create a quadratic relationship: Y = 0.05 * X^2 + 10 * X + noise
+  Y <- 5 + (0.05 * X^2) + (10 * X) + rnorm(length(X), mean = 0, sd = 100) 
+  non_linear_dat <- data.frame(X = X, Y = Y)
+  print("NOTE: Using simulated quadratic data for demonstration.")
+})
+
+
+# 2. MODELING THE CURVE USING POLYNOMIAL REGRESSION (Still uses lm)
+# ------------------------------------------------------------------------------
+# The poly(X, 2) term tells R to create both the linear term (X) and 
+# the squared term (X^2) for the predictor, allowing the overall model 
+# to fit a quadratic curve. This is the recommended approach.
+
+model_poly_2 <- lm(Y ~ poly(X, 2), data = non_linear_dat)
+
+print("--- Summary of Polynomial (Quadratic) Linear Model ---")
+print(summary(model_poly_2))
+
+
+# 3. ALTERNATIVE: LOG TRANSFORMATION
+# ------------------------------------------------------------------------------
+# Log transformation is useful if the relationship is multiplicative (e.g., exponential growth)
+# If the Y variable grows exponentially, taking the log of Y often linearizes the relationship.
+
+# NOTE: This only works if all Y values are positive (Y > 0)
+if(all(non_linear_dat$Y > 0)) {
+  model_log_y <- lm(log(Y) ~ X, data = non_linear_dat)
+  print("--- Summary of Log-Transformed Linear Model (log(Y) ~ X) ---")
+  print(summary(model_log_y))
+} else {
+  print("Skipped Log Transformation: Response variable Y contains zero or negative values.")
+}
+
+
+# 4. VISUALIZATION (Plotting the Polynomial Fit)
+# ------------------------------------------------------------------------------
+plot_poly_fit <- ggplot(non_linear_dat, aes(x = X, y = Y)) +
+  geom_point(alpha = 0.6) +
+  # Add the fitted line from the quadratic model
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2), color = "red", se = FALSE) + 
+  labs(title = "Quadratic Model Fit using Linear Regression (lm)",
+       subtitle = "Model: Y ~ poly(X, 2)",
+       x = "Predictor X",
+       y = "Response Y") +
+  theme_minimal()
+
+print(plot_poly_fit)
