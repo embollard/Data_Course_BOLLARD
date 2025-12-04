@@ -1,44 +1,87 @@
 ---
-output: 
-html_document:
-  number_sections=TRUE
-pagetitle: Assignment_9
+title: "Assignment 9: Graduate School Admissions Analysis"
+author: "Evangeline Bollard"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    theme: cosmo
 ---
 
-
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-# **Assignment 9**
+First, the necessary libraries used for this project are loaded. 
 
-In this assignment, you will use R (within R-Studio) to:
-  
-+ Load and clean a real data set
-+ Conduct exploratory analyses, including informative figures
-+ Build and test appropriate models
-+ Draw conclusions about your data
-+ Combine all of the above into a well-documented R-Markdown report and export (knit) it into an HTML file
+```
+library(dplyr)      
+library(ggplot2)    
+library(patchwork)  
+library(broom)
+```
 
-**All file paths should be relative, starting from *your* Assignment_9 directory!!**
+Next, the data is imported using a relative path.
 
-**This means that you need to create a new R-Project named "Assignment_9.Rproj" in your Assignment_9 directory, and work from scripts within that.**
+```
+grad_data <- read.csv("./Data/GradSchool_Admissions.csv")
+```
+
+# Cleaning the Data
+Then the required data cleaning steps are performed to prepare variables for modeling. The outcome variable, **admit**, and the categorical predictor, **rank**, are converted to factors. 
 
 
-## **For credit...**
+``` 
+0 = Denied, 1 = Admitted. Denied (0) will be the reference level.
+data$admit <- factor(data$admit, 
+                     levels = c(0, 1), 
+                     labels = c("Denied", "Admitted")) 
+```
 
-1.  Push a completed version of your Rproj and R-markdown file (details at end of this assignment) to GitHub
-2.  Your score will also depend on your analyses and presentation of your final report
+``` 
+Convert 'rank' (predictor) to a factor
+# Rank 1 (Top-tier) will be the reference level for the model.
+data$rank <- factor(data$rank, 
+                    levels = 1:4, 
+                    labels = paste("Rank", 1:4))
+``` 
 
-____________
+# Summary Statistics
+This section explores the distributions of the predictors (GRE, GPA, and rank) and their relationship with the outcome variable (admittance). But first, we will review the overall summary statistics.
+```
+print(summary(grad_data))
+```
 
-# Your tasks:
+We then examined whether the proportion of admitted versus denied students for each undergraduate institution was affected by the institution rank.
+```
+rank_summary <- grad_data %>%
+  group_by(rank) %>%
+  summarise(
+    Total_Applicants = n(),
+    Admission_Rate = mean(admit == "Admitted"),
+    Avg_GRE = mean(gre),
+    Avg_GPA = mean(gpa)
+  )
+print(rank_summary)
+```
+![Figure 1: Admission Status Data](./Admission_rates_by_rank_data.png)
 
-+ Use the data set "/Data/GradSchool_Admissions.csv"
-+ You will explore and model the predictors of graduate school admission
-  - the "admit" column is coded as 1=success and 0=failure (that's binary, so model appropriately)
-  - the other columns are the GRE score, the GPA, and the rank of the undergraduate institution, where I is "top-tier."
-+ Document your data explorations, figures, and conclusions in a reproducible R-markdown report
-+ That means I want to see, in your html report, your process of model evaluation and selection. Here's an [example](https://gzahn.github.io/data-course/Repository/Assignments/Assignment_9/example.html){target="_blank"}
-+ Upload your **self-contained** R project, including knitted HTML report, to GitHub in *your* Assignment_9 directory
+The summary statistics clearly show a relationship between rank and the admission rate, with Rank 1 institutions having the highest success rate. The following figure shows the proportion of admitted versus denied students for each undergraduate institution rank.
 
+![Figure 2: Admission Status Bar Graph](./Admission Status by Institution Rank Bar Graph.png)
+
+# Box plots
+In this case, box plots are used to compare the distributions of the continuous predictors (GRE and GPA) between admitted and denied applicants.
+![Figure 3: GRE and GPA Box Plots](./GRE and GPA by Admission Status Graphs.png)
+Conclusions: On average, applicants who were admitted to graduate schools had higher GRE scores and higher GPA scores compared to those who were denied.
+
+# Model Building
+Because the outcome variable (admittance to graduate school) is binary (yes or no), a Logistic Regression model would work well. The odds of admission will be calculated using GRE, GPA and Rank as functions. 
+![Figure 4: Full Model Fit Data](./Full_Model_Fit_Data.png)
+We used first a model that compared GRE and GPA and then a second model that added institutional rank. These modelw were then compared with each other using the Likeihood Ratio Test which employs the difference in deviance between the two models to test the hypothesis that the added variable is necessary. The residual deviance decreased from 480.34 in Model 1 to 458.52 in Model 2; a decrease of 21.826 which indicates that adding rank did improve the model's fit.  
+![Figure 5: Likelihood Ratio Test Results ](./Analysis of Deviance Table.PNG)
+
+# Odds Ratio
+The Odds Ratio or OR is a measure of association etween an exposure and an outcome. In logistic regression, it predicts the change in the odds of the outcome occurring for every one-unit change in the predictor variable while holding other predictors constant. If the OR is 1 there is no association, if the OR is less than 1, the predictor is associated with increased odds of the desired outcome. If the OR is greater than 1, the precidtor is associated with decreased odds of the desired outcome.
+![Figure 6: Odds Ratio ](./OR_table_data.png)
